@@ -4,10 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
+use App\Filament\Resources\PostResource\RelationManagers\AuthorsRelationManager;
 use App\Models\Category;
 use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
@@ -62,6 +64,22 @@ class PostResource extends Resource
                         TagsInput::make('tags')->required(),
                         Checkbox::make('published'),
                     ]),
+                    // without preload it only loads users when you start searching, so you need to know user names
+                    // now we preload, which shows the users that can be selected, downside: if many users exist it'll take longer
+                    Section::make('Authors')->schema([
+                        Select::make('authors')
+                        ->label('Co Authors')
+                        ->multiple()
+                        //->searchable(false)
+                        ->preload()
+                        ->relationship('authors', 'name'),
+                    ]),
+                    // CheckboxList instead of Select + multiple
+                    // Section::make('Authors')->schema([
+                    //     CheckboxList::make('authors')
+                    //     ->label('Co Authors')
+                    //     ->relationship('authors', 'name'),
+                    // ]),
                 ]),
             ])->columns(3);
     }
@@ -114,7 +132,7 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AuthorsRelationManager::class
         ];
     }
 
