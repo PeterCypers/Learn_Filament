@@ -41,13 +41,14 @@ class PostResource extends Resource
                 ->description('create posts over here.')
                 ->collapsible()
                 ->schema([
-                    TextInput::make('title')->required(),
-                    TextInput::make('slug')->required(),
+                    TextInput::make('title')->rules('min:3|max:10')->required(),
+                    TextInput::make('slug')->required()->unique(ignoreRecord:true),
 
                     Select::make('category_id')
                         ->label('Category')
                         ->options(Category::all()->pluck('name', 'id'))
-                        ->searchable(),
+                        ->searchable()
+                        ->required(),
 
                     ColorPicker::make('color')->required(),
 
@@ -59,7 +60,7 @@ class PostResource extends Resource
                     ])->columnSpan(1)->collapsible(),
                     Section::make('Meta')->schema([
                         TagsInput::make('tags')->required(),
-                    Checkbox::make('published'),
+                        Checkbox::make('published'),
                     ]),
                 ]),
             ])->columns(3);
