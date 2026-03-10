@@ -16,10 +16,14 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+// use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ColorColumn;
@@ -39,48 +43,52 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Create a Post')
-                ->description('create posts over here.')
-                ->collapsible()
-                ->schema([
-                    TextInput::make('title')->rules('min:3|max:10')->required(),
-                    TextInput::make('slug')->required()->unique(ignoreRecord:true),
 
-                    Select::make('category_id')
-                        ->label('Category')
-                        ->relationship('category', 'name')
-                        //->searchable() // removed searchable because of relationship things are only pulled from DB as needed, so we won't see anything until searching a letter
-                        ->required(),
+                Tabs::make('Create New Post')->tabs([
+                    Tab::make('Tab 1')
+                    ->icon('heroicon-o-folder')
+                    ->iconPosition(IconPosition::Before) // before is default, but you can set it After also
+                    ->badge('Hi')
+                    ->schema([
+                        TextInput::make('title')->rules('min:3|max:10')->required(),
+                        TextInput::make('slug')->required()->unique(ignoreRecord:true),
 
-                    ColorPicker::make('color')->required(),
+                        Select::make('category_id')
+                            ->label('Category')
+                            ->relationship('category', 'name')
+                            //->searchable() // removed searchable because of relationship things are only pulled from DB as needed, so we won't see anything until searching a letter
+                            ->required(),
 
-                    MarkdownEditor::make('content')->required()->columnSpanFull(),
-                ])->columnSpan(2)->columns(2),
-                Group::make()->schema([
-                    Section::make('Image')->schema([
+                        ColorPicker::make('color')->required(),
+                    ]),
+                    Tab::make('Content')->icon('heroicon-o-newspaper')->schema([
+                        MarkdownEditor::make('content')->required()->columnSpanFull(),
+                    ]),
+                    Tab::make('Meta')->icon('heroicon-o-photo')->schema([
                         FileUpload::make('thumbnail')->disk('public')->directory('thumbnails'),
-                    ])->columnSpan(1)->collapsible(),
-                    Section::make('Meta')->schema([
                         TagsInput::make('tags')->required(),
                         Checkbox::make('published'),
                     ]),
-                    // without preload it only loads users when you start searching, so you need to know user names
-                    // now we preload, which shows the users that can be selected, downside: if many users exist it'll take longer
-                    Section::make('Authors')->schema([
+                    Tab::make('Authors')->icon('heroicon-o-users')->schema([
+                        // without preload it only loads users when you start searching, so you need to know user names
+                        // now we preload, which shows the users that can be selected, downside: if many users exist it'll take longer
                         Select::make('authors')
                         ->label('Co Authors')
                         ->multiple()
                         //->searchable(false)
                         ->preload()
                         ->relationship('authors', 'name'),
-                    ]),
-                    // CheckboxList instead of Select + multiple
-                    // Section::make('Authors')->schema([
-                    //     CheckboxList::make('authors')
-                    //     ->label('Co Authors')
-                    //     ->relationship('authors', 'name'),
-                    // ]),
-                ]),
+
+                        // CheckboxList instead of Select + multiple
+                        // Section::make('Authors')->schema([
+                        //     CheckboxList::make('authors')
+                        //     ->label('Co Authors')
+                        //     ->relationship('authors', 'name'),
+                        // ]),
+                    ])
+                    // set the tab that is shown when page loads
+                    // shows the tabs in the URL so you can share this webpage including active tab
+                ])->columnSpanFull()->activeTab(1)->persistTabInQueryString(),
             ])->columns(3);
     }
 
