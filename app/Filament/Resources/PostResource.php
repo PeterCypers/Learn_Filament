@@ -70,19 +70,39 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                ->sortable()
+                ->searchable()
+                ->toggleable(isToggledHiddenByDefault:true),
                 ImageColumn::make('thumbnail'),
                 ColorColumn::make('color'),
-                TextColumn::make('title'),
-                TextColumn::make('slug'),
-                TextColumn::make('category.name'), // works because we have a set-relationship, it knows that category has name field
+                TextColumn::make('title')
+                ->sortable()
+                ->searchable()
+                ->toggleable(),
+                TextColumn::make('slug')
+                ->sortable()
+                ->searchable()
+                ->toggleable(),
+                TextColumn::make('category.name') // works because we have a set-relationship, it knows that category has name field
+                ->sortable()
+                ->searchable()
+                ->toggleable(),
                 TextColumn::make('tags'),
                 CheckboxColumn::make('published'),
+                TextColumn::make('created_at')
+                ->label('Published on')
+                ->date()
+                ->sortable()
+                ->searchable()
+                ->toggleable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
