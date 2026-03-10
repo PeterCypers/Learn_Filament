@@ -46,8 +46,8 @@ class PostResource extends Resource
 
                     Select::make('category_id')
                         ->label('Category')
-                        ->options(Category::all()->pluck('name', 'id'))
-                        ->searchable()
+                        ->relationship('category', 'name')
+                        //->searchable() // removed searchable because of relationship things are only pulled from DB as needed, so we won't see anything until searching a letter
                         ->required(),
 
                     ColorPicker::make('color')->required(),
