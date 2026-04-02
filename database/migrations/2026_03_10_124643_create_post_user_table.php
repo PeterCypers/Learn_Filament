@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class);
             $table->integer('order')->default(0);
             $table->timestamps();
+            // $table->softDeletes();
         });
     }
 
