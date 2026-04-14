@@ -32,6 +32,9 @@ class UserResource extends Resource
                 TextInput::make('name')->required(),
                 TextInput::make('email')->email(),
                 TextInput::make('password')->password(),
+                Select::make('role')
+                ->options(User::ROLES)
+                ->required(),
                 // Select::make('name')->options([
                 //     'db-stored-value' => 'user-visible-option',
                 //     'test' => 'test',
@@ -45,8 +48,37 @@ class UserResource extends Resource
             // defines what the table of users looks like
             ->columns([
                 TextColumn::make('id'),
-                TextColumn::make('name'),
-                TextColumn::make('email'),
+                TextColumn::make('name')
+                ->searchable(),
+                TextColumn::make('email')
+                ->searchable(),
+
+                Tables\Columns\TextColumn :: make('created_at')
+                ->dateTime()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn :: make('updated_at')
+                ->dateTime()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn :: make('role')
+                ->badge()
+                ->color(function(string $state): string {
+                    // options: 'info'(blue) / 'warning'(amber) / 'danger'(red) / 'success'(green) / 'gray' (zinc) / 'primary' (amber)
+                    // if ($state == 'ADMIN') return 'danger';
+                    // if ($state == 'EDITOR') return 'info';
+                    // if ($state == 'USER') return 'success';
+                    // return 'gray';
+
+                    return match($state) {
+                        'ADMIN' => 'danger',
+                        'EDITOR' => 'info',
+                        'USER' => 'success',
+                        // default => 'gray',
+                    };
+                })
+                ->sortable()
+                ->searchable(),
             ])
             ->filters([
                 //
