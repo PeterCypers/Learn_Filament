@@ -25,6 +25,8 @@ class CategoryResource extends Resource
     // to change the name of this tab in the tabs-sidebar:
     // protected static ?string $modelLabel = 'Post-Categories';
 
+    protected static bool $shouldSkipAuthorization = true;
+
     public static function form(Form $form): Form
     {
         return $form
