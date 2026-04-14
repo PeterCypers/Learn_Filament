@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class CategoryResource extends Resource
 {
@@ -31,7 +32,20 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->required(),
+                TextInput::make('name')
+                ->required()
+                ->live(onBlur: true)
+                ->afterStateUpdated(function(string $operation, string $state, Forms\Set $set, Forms\Get $get, Category $category) { // important: exact names for enject-variables
+                    #dump($operation); // create -> edit | create
+                    #dump($state); // 'typed text'
+                    #dump($set); // Set object -> can be used to update(set) values in any defined fields in the form
+                    #dump($Get); // Get object -> can be used to get values from any defined fields in the form (watch out if other formfields aren't live() you won't get a live-updated value)
+                    #dump($category); // the current $model, only works on edit
+                    if ($operation === 'edit') {
+                        return; // -> when you want the slug only to generate 1x, UC: you don't want paths to change after being set once
+                    }
+                    $set('slug', Str::slug($state)); // use Illuminate\Support\Str; string helper
+                }),
                 TextInput::make('slug')->required(),
             ]);
     }
